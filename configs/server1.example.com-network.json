@@ -1,0 +1,11 @@
+{
+  "environment": null,
+  "gateway": "10.1.1.1",
+  "id": 23,
+  "location_id": 2,
+  "name": "NETWORK-TEST1",
+  "netmask": "255.255.255.0",
+  "network": "10.1.1.0",
+  "service_id": 1,
+  "vlan": "100"
+}

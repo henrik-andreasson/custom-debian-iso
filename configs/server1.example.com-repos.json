@@ -1,0 +1,5 @@
+{
+  "postinstall": "current",
+  "srv-debian-pkgs": "2021-09-28",
+  "adoptopenjdk8": "adoptopenjdk-8-hotspot-u292"
+}

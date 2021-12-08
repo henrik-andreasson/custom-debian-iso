@@ -1,0 +1,19 @@
+{
+  "comment": "",
+  "cpu": "4",
+  "environment": "tools",
+  "hd": "20GB",
+  "hostname": "server1.example.com",
+  "ip_address": "10.1.1.2",
+  "name_server1": "1.1.1.1",
+  "name_server2": "4.4.4.4",
+  "hosting_server_id": null,
+  "id": 120,
+  "memory": "24GB",
+  "network_id": 1,
+  "os_name": "debian",
+  "os_version": "10.9",
+  "role": "SRV1",
+  "service_id": 1,
+  "status": "operation"
+}

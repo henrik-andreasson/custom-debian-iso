@@ -1,0 +1,24 @@
+{
+  "packages": [
+    "debian-fat-postinstall",
+    "ntp",
+    "zip",
+    "unzip",
+    "jq",
+    "wget",
+    "curl",
+    "lsof",
+    "rsync",
+    "tcpdump",
+    "vim",
+    "openssh-server",
+    "mariadb-server",
+    "net-tools",
+    "ansible",
+    "adoptopenjdk-8-hotspot",
+    "lvm2",
+    "glusterfs-client",
+    "glusterfs-server",
+    "python3-pymysql"
+  ]
+}
