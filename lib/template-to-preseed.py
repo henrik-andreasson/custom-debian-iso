@@ -6,12 +6,13 @@ from jinja2 import Environment, FileSystemLoader
 
 # Load Jinja2 template
 env = Environment(loader=FileSystemLoader('./'), trim_blocks=True, lstrip_blocks=True)
-template = env.get_template('preseed.template')
+
 
 parser = optparse.OptionParser(usage="usage: %prog [options]")
 parser.add_option("-s", "--server", help="server json file")
 parser.add_option("-n", "--network", help="network json file")
 parser.add_option("-p", "--packages", help="packages json file")
+parser.add_option("-t", "--template", help="debian preseed jinga2 template file")
 
 opts, args = parser.parse_args()
 
@@ -24,6 +25,12 @@ if opts.server:
     short_hostname = serverinfo['hostname'].split('.', 1)[0]
     domainname = serverinfo['hostname'].split('.', 1)[1]
     jingadata = {'short_hostname': short_hostname, 'domainname': domainname}
+
+if opts.template:
+    template = env.get_template(opts.template)
+else:
+    template = env.get_template('lib/preseed.template')
+
 
 netinfo = {}
 if opts.network:

@@ -1,0 +1,9 @@
+{
+  "postinstall": "current",
+  "csapps": "2022-05",
+  "atom": "2022-06-06",
+  "temurin": "2022-06-06",
+  "workstation": "2022-06-09",
+  "sac": "10.7",
+  "luna10": "10.4.1"
+}

@@ -31,7 +31,7 @@ for cfg in ${ISOLINUX_DIR}/preseed-*cfg ; do
 
 cat<<__EOF__>>$ISOLINUX_DIR/csws.cfg
 label
-	menu label ^Server $hostnamex
+	menu label ^$hostnamex
 	menu default
 	kernel /install.amd/vmlinuz
 	append auto=true priority=critical vga=788 initrd=/install.amd/initrd.gz --quiet file=/cdrom/isolinux/$filename
