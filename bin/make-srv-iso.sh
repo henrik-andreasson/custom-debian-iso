@@ -29,12 +29,12 @@ cp lib/csws.cfg server/isolinux/
 /bin/echo  "done."
 
 /bin/echo -n  "Adding servers..."
-for server in configs/root*server.json ; do
+for server in configs/*server.json ; do
 	servername=$(jq .hostname $server  | tr -d '"')
 	if [ -f "configs/$servername-packages.json" ] ; then
 		packages="configs/$servername-packages.json"
 	else
-		packages="configs/packages.json"
+		packages="configs/default-packages.json"
 	fi
 	if [ ! -f "configs/${servername}-network.json" ] ; then
 		echo "network file must exit: configs/${servername}-network.json"
@@ -44,12 +44,19 @@ for server in configs/root*server.json ; do
 	echo "added server: $servername"
 
   /bin/echo -n "Updating the iso with server repos..."
-  ./bin/copy-repos.sh "configs/${servername}-repos.json" server/ > "${logfile}" 2>&1
+  if [ -f "configs/${servername}-repos.json" ] ; then
+    ./bin/copy-repos.sh "configs/${servername}-repos.json" server/ > "${logfile}" 2>&1
+  elif [ -f "configs/default--repos.json" ] ; then
+    ./bin/copy-repos.sh "configs/default-repos.json" server/ > "${logfile}" 2>&1
+  else
+    echo "no repos conffi found, not: configs/${servername}-repos.json nor: configs/default-repos.json"
+  fi
   /bin/echo  "done."
 
 done
 
 ./bin/create-isolinux-menu.sh
+./bin/create-efi-menu.sh
 
 /bin/echo -n "Creating the iso..."
 ./bin/create-iso.sh -i "${isoname}" > "${logfile}" 2>&1

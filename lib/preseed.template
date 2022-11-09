@@ -29,10 +29,13 @@ d-i netcfg/choose_interface select auto
 #d-i netcfg/get_hostname string cs-install
 #d-i netcfg/get_domain string cs-adminnet
 
+
 d-i netcfg/disable_autoconfig boolean true
+
 d-i netcfg/get_nameservers  string {% if server_name_server1 %}{{ server_name_server1 }}{% endif %} {% if server_name_server2 %}{{ server_name_server2 }}{% endif %} {% if server_name_server3 %}{{ server_name_server3 }}{% endif %}
 
-d-i netcfg/get_ipaddress    string {{ server_ip_address }}
+d-i netcfg/get_ipaddress    string {% if server_ip_address %}{{ server_ip_address }}{% endif %} {% if server_ipaddress %}{{ server_ipaddress }}{% endif %}
+
 d-i netcfg/get_netmask      string {{ net_netmask }}
 d-i netcfg/get_gateway      string {{ net_gateway }}
 d-i netcfg/confirm_static   boolean true
@@ -131,7 +134,13 @@ d-i		   partman-auto/choose_recipe	   csdisk
 #             disk size numbers in mb:  minimum prio    max
 d-i partman-auto/expert_recipe string                         \
       boot-root ::                                            \
-              2000 2000 3000 ext4                                 \
+              538 538 1075 free                                 \
+                $iflabel{ gpt }                                 \
+                $reusemethod{ }                                 \
+                method{ efi }                                   \
+                format{ }                                       \
+              .                                               \
+              2000 2000 3000 ext4                             \
                       $primary{ }                             \
                       $bootable{ }                            \
                       method{ format } format{ }              \
@@ -161,6 +170,12 @@ d-i partman-auto/expert_recipe string                         \
                       method{ format } format{ }              \
                       use_filesystem{ } filesystem{ ext4 }    \
                       mountpoint{ /var/log }                      \
+              .                                               \
+              1000 2000 30000 ext4                            \
+                      $lvmok{ }                               \
+                      method{ format } format{ }              \
+                      use_filesystem{ } filesystem{ ext4 }    \
+                      mountpoint{ /backup0 }                      \
               .                                               \
               8000 8000 200% linux-swap                       \
                       $lvmok{ }                               \
@@ -229,6 +244,10 @@ d-i pkgsel/upgrade select none
 # popular and include it on CDs.
 popularity-contest popularity-contest/participate boolean false
 
+# dont look for more dvd:s
+d-i apt-setup/cdrom/set-first boolean false
+d-i apt-setup/cdrom/set-next boolean false
+d-i apt-setup/cdrom/set-failed boolean false
 
 ### Boot loader installation
 # Grub is the default boot loader (for x86). If you want lilo installed
@@ -238,6 +257,7 @@ popularity-contest popularity-contest/participate boolean false
 # too:
 #d-i lilo-installer/skip boolean true
 
+d-i partman-efi/non_efi_system true
 
 # This is fairly safe to set, it makes grub install automatically to the MBR
 # if no other operating system is detected on the machine.

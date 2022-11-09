@@ -29,11 +29,9 @@ if [ "x$source" = "x" ] ; then
   source="server"
 fi
 
-
 xorriso -as mkisofs -r -checksum_algorithm_iso md5,sha1,sha256,sha512 \
   -V "$isoname" \
   -o  "$output" \
-  -J -joliet-long \
   -isohybrid-mbr /usr/lib/ISOLINUX/isohdpfx.bin \
   -b isolinux/isolinux.bin -c isolinux/boot.cat \
   -boot-load-size 4 -boot-info-table -no-emul-boot \
