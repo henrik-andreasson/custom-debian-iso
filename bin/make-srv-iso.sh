@@ -56,7 +56,7 @@ for server in configs/*server.json ; do
 done
 
 ./bin/create-isolinux-menu.sh
-./bin/create-efi-menu.sh
+./bin/create-uefi-menu.sh
 
 /bin/echo -n "Creating the iso..."
 ./bin/create-iso.sh -i "${isoname}" > "${logfile}" 2>&1
