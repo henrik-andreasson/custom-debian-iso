@@ -11,6 +11,7 @@ env = Environment(loader=FileSystemLoader('./'), trim_blocks=True, lstrip_blocks
 parser = optparse.OptionParser(usage="usage: %prog [options]")
 parser.add_option("-s", "--server", help="server json file")
 parser.add_option("-n", "--network", help="network json file")
+parser.add_option("-o", "--support", help="support json file")
 parser.add_option("-p", "--packages", help="packages json file")
 parser.add_option("-t", "--template", help="debian preseed jinga2 template file")
 
@@ -42,6 +43,11 @@ if opts.packages:
     with open(opts.packages, 'r') as f:
         packagesinfo = json.load(f)
 
+packagesinfo = {}
+if opts.support:
+    with open(opts.support, 'r') as f:
+        support = json.load(f)
+
 for key, value in serverinfo.items():
     newkey = f'server_{key}'
     jingadata[newkey] = value
@@ -53,5 +59,8 @@ for key, value in netinfo.items():
 for key, value in packagesinfo.items():
     jingadata[key] = value
 
-# Render template using data and print the output
+for key, value in support.items():
+    newkey = f'support_{key}'
+    jingadata[newkey] = value
+
 print(template.render(jingadata))

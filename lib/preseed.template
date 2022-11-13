@@ -32,7 +32,7 @@ d-i netcfg/choose_interface select auto
 
 d-i netcfg/disable_autoconfig boolean true
 
-d-i netcfg/get_nameservers  string {% if server_name_server1 %}{{ server_name_server1 }}{% endif %} {% if server_name_server2 %}{{ server_name_server2 }}{% endif %} {% if server_name_server3 %}{{ server_name_server3 }}{% endif %}
+d-i netcfg/get_nameservers  string {% for item in support_dns_server %}{{item}} {% endfor %}
 
 d-i netcfg/get_ipaddress    string {% if server_ip_address %}{{ server_ip_address }}{% endif %} {% if server_ipaddress %}{{ server_ipaddress }}{% endif %}
 
@@ -72,14 +72,14 @@ d-i passwd/root-password-crypted password lpXqZe4zkGzfg
 # d-i passwd/root-password-crypted password $6$/WbYkxT9w$H2a5zg2OTXys7KQ0e3.3tZaFjHMh7VSMlzZr75RMjTNIh7ZHoTlVF4cC3TDLm5R3woGN/.iTxfYFIawD2x/Fg1
 
 # Alternatively, to skip creation of a normal user account.
-d-i passwd/make-user boolean false
+d-i passwd/make-user boolean true
 
 # To create a normal user account.
-#d-i passwd/user-fullname string Default user
-#d-i passwd/username string han
+d-i passwd/user-fullname string install
+d-i passwd/username string install
 # Normal user's password, either in clear text
-#d-i passwd/user-password password foo123
-#d-i passwd/user-password-again password foo123
+d-i passwd/user-password password foo123
+d-i passwd/user-password-again password foo123
 
 ### Clock and time zone setup
 # Controls whether or not the hardware clock is set to UTC.
@@ -92,7 +92,7 @@ d-i time/zone string Europe/Stockholm
 # Controls whether to use NTP to set the clock during the install
 d-i clock-setup/ntp boolean true
 # NTP server to use. The default is almost always fine here.
-d-i clock-setup/ntp-server string ntp.wm.net
+d-i clock-setup/ntp-server string {% for item in support_ntp_server %}{{item}} {% endfor %}
 
 ### Partitioning
 ## Partitioning example
@@ -223,6 +223,8 @@ d-i apt-setup/use_mirror boolean false
 # Values shown below are the normal defaults.
 #d-i apt-setup/services-select multiselect security, volatile
 #d-i apt-setup/security_host string security.debian.org
+
+d-i apt-setup/no_mirror boolean false
 
 tasksel tasksel/first select standard
 

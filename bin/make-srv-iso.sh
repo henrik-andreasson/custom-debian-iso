@@ -36,11 +36,23 @@ for server in configs/*server.json ; do
 	else
 		packages="configs/default-packages.json"
 	fi
+  support=""
+  if [ -f "configs/$servername-support.json" ] ; then
+		support="configs/$servername-support.json"
+	else
+		support="configs/default-support.json"
+	fi
+
 	if [ ! -f "configs/${servername}-network.json" ] ; then
 		echo "network file must exit: configs/${servername}-network.json"
 		exit
 	fi
-	python3 ./lib/template-to-preseed.py --packages "$packages" --server "$server" --network "configs/${servername}-network.json"  > "server/isolinux/preseed-$servername.cfg"
+	python3 ./lib/template-to-preseed.py --packages "$packages" \
+    --server "$server" \
+    --support "$support" \
+    --network "configs/${servername}-network.json" \
+    > "server/isolinux/preseed-$servername.cfg"
+
 	echo "added server: $servername"
 
   /bin/echo -n "Updating the iso with server repos..."
