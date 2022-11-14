@@ -1,8 +1,8 @@
 #!/bin/bash
 
-logfile="$(mktemp -p /tmp logfile-XXXXXXX)"
-isoname=""
 date_ts=$(date +"%Y-%m-%d_%H.%M.%S")
+logfile="$(mktemp -p logs logfile-${date_ts}-XXXXXXX)"
+isoname=""
 
 if [ "x$1" != "x" ] ; then
   isoname=$1
@@ -19,11 +19,11 @@ mkdir -p repos/postinstall/current
 cp debian-fat-postinstall*_amd64.deb repos/postinstall/current/
 (
   cd repos/postinstall/current/
-  ../../../bin/create-repo.sh > "${logfile}" 2>&1
+  ../../../bin/create-repo.sh >> "../../../${logfile}" 2>&1
 )
 
 /bin/echo -n "Updating common repos on the iso..."
-./bin/copy-repos.sh configs/repos.json server/ > "${logfile}" 2>&1
+./bin/copy-repos.sh configs/repos.json server/ >> "${logfile}" 2>&1
 cp lib/isolinux.cfg server/isolinux/
 cp lib/csws.cfg server/isolinux/
 /bin/echo  "done."
@@ -57,11 +57,11 @@ for server in configs/*server.json ; do
 
   /bin/echo -n "Updating the iso with server repos..."
   if [ -f "configs/${servername}-repos.json" ] ; then
-    ./bin/copy-repos.sh "configs/${servername}-repos.json" server/ > "${logfile}" 2>&1
+    ./bin/copy-repos.sh "configs/${servername}-repos.json" server/ >> "${logfile}" 2>&1
   elif [ -f "configs/default--repos.json" ] ; then
-    ./bin/copy-repos.sh "configs/default-repos.json" server/ > "${logfile}" 2>&1
+    ./bin/copy-repos.sh "configs/default-repos.json" server/ >> "${logfile}" 2>&1
   else
-    echo "no repos conffi found, not: configs/${servername}-repos.json nor: configs/default-repos.json"
+    echo "no repos config found, not: configs/${servername}-repos.json nor: configs/default-repos.json"
   fi
   /bin/echo  "done."
 
@@ -71,7 +71,7 @@ done
 ./bin/create-uefi-menu.sh
 
 /bin/echo -n "Creating the iso..."
-./bin/create-iso.sh -i "${isoname}" > "${logfile}" 2>&1
+./bin/create-iso.sh -i "${isoname}" >> "${logfile}" 2>&1
 /bin/echo  "done."
 
 echo "Iso: ${isoname} is in output: ${output}"
