@@ -31,9 +31,12 @@ cp lib/csws.cfg server/isolinux/
 /bin/echo -n  "Adding servers..."
 for server in configs/*server.json ; do
 	servername=$(jq .hostname $server  | tr -d '"')
+  packages=""
 	if [ -f "configs/$servername-packages.json" ] ; then
+    echo "Using configs/$servername-packages.json"
 		packages="configs/$servername-packages.json"
 	else
+    echo "Using configs/default-packages.json ($servername)"
 		packages="configs/default-packages.json"
 	fi
   support=""
@@ -68,7 +71,7 @@ for server in configs/*server.json ; do
 done
 
 ./bin/create-isolinux-menu.sh
-./bin/create-uefi-menu.sh
+./bin/create-uefi-menu.sh -i server/isolinux -u server/boot/grub
 
 /bin/echo -n "Creating the iso..."
 ./bin/create-iso.sh -i "${isoname}" >> "${logfile}" 2>&1

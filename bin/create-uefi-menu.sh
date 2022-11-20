@@ -8,7 +8,30 @@ else
 fi
 
 
-cat<<__EOF__>$EFI_MENU_DIR/grub.cfg
+while getopts u:i: flag; do
+  case $flag in
+    i) isolinux="$OPTARG";
+      ;;
+    u) uefidir=$OPTARG;
+      ;;
+    ?)
+      exit;
+      ;;
+  esac
+done
+
+
+if [ "x$isolinux" == "x" ] ; then
+	echo "-i isolinux dir - where the preseed files are"
+	exit -1
+fi
+
+if [ "x$uefidir" == "x" ] ; then
+	echo "-u uefidir dir - where the grub.cfg file are"
+	exit -2
+fi
+
+cat<<__EOF__>$uefidir/grub.cfg
 
 if loadfont $prefix/font.pf2 ; then
   set gfxmode=800x600
@@ -41,11 +64,12 @@ set theme=/boot/grub/theme/1
 
 __EOF__
 
-for cfg in ${EFI_MENU_DIR}/preseed-*cfg ; do
+
+for cfg in ${isolinux}/preseed-*cfg ; do
 	filename=$(basename $cfg)
 	hostnamex=$(echo $filename | sed 's/preseed-//' | sed 's/\.cfg//' )
 
-cat<<__EOF__>>$EFI_MENU_DIR/grub.cfg
+cat<<__EOF__>>$uefidir/grub.cfg
 
 
 menuentry --hotkey=6 'Install $hostnamex' {
