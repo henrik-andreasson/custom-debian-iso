@@ -17,13 +17,17 @@ while getopts n:s: flag; do
   esac
 done
 
-isoname=""
 if [ "x$isoname" == "x" ] ; then
   isoname="snapshot-${date_ts}"
 fi
 
 if [ "x$serverdir" == "x" ] ; then
   serverdir="server"
+fi
+
+if [[ ! -d "$serverdir" ]] ; then
+  echo "serverdir not found ($serverdir)"
+  exit -1
 fi
 
 output="custom-debian-iso-${isoname}-11.0.0-amd64.iso"
