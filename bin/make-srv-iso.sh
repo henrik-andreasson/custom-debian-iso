@@ -23,12 +23,20 @@ while getopts n:s:c:o: flag; do
   esac
 done
 
-if [ "x$isoname" == "x" ] ; then
+if [[ "x${ISONAME}" == "x" ]]; then
+  isoname="${ISONAME}"
+
+elif [[ "x$isoname" == "x" ]] ; then
   isoname="snapshot-${date_ts}"
+
 fi
 
-if [ "x$serverdir" == "x" ] ; then
+if [[ "x${SERVERDIR}" == "x" ]]; then
+  serverdir="${SERVERDIR}"
+
+elif [[ "x$serverdir" == "x" ]] ; then
   serverdir="server"
+
 fi
 
 if [[ ! -d "$serverdir" ]] ; then
@@ -36,7 +44,9 @@ if [[ ! -d "$serverdir" ]] ; then
   exit -1
 fi
 
-if [ "x$configdir" == "x" ] ; then
+if [[ "x${CONFIGDIR}" != "x" ]] ; then
+  configdir="${CONFIGDIR}"
+elif [[ "x$configdir" == "x" ]] ; then
   configdir="configs"
 fi
 
@@ -45,8 +55,10 @@ if [[ ! -d "$configdir" ]] ; then
   exit -1
 fi
 
+if [[ "x$OUTDIR" != "x" ]] ; then
+  outputdir="${OUTDIR}"
+elif [[ "x$outputdir" == "x" ]] ; then
 
-if [ "x$outputdir" == "x" ] ; then
   outputdir="."
 fi
 
