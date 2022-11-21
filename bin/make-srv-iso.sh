@@ -111,7 +111,7 @@ for server in ${configdir}/*server.json ; do
   /bin/echo -n "Updating the iso with server repos..."
   if [ -f "${configdir}/${servername}-repos.json" ] ; then
     ./bin/copy-repos.sh "${configdir}/${servername}-repos.json" "${serverdir}" >> "${logfile}" 2>&1
-  elif [ -f "${configdir}/default--repos.json" ] ; then
+  elif [ -f "${configdir}/default-repos.json" ] ; then
     ./bin/copy-repos.sh "${configdir}/default-repos.json" "${serverdir}" >> "${logfile}" 2>&1
   else
     echo "no repos config found, not: ${configdir}/${servername}-repos.json nor: ${configdir}/default-repos.json"
