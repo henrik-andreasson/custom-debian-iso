@@ -6,7 +6,7 @@ isoname=""
 serverdir=""
 configdir=""
 
-while getopts n:s: flag; do
+while getopts n:s:c:o: flag; do
   case $flag in
     n) isoname="$OPTARG";
       ;;
@@ -14,7 +14,7 @@ while getopts n:s: flag; do
       ;;
     c) configdir=$OPTARG;
       ;;
-    c) outputdir=$OPTARG;
+    o) outputdir=$OPTARG;
       ;;
 
     ?)
@@ -44,6 +44,18 @@ if [[ ! -d "$configdir" ]] ; then
   echo "configdir not found ($configdir)"
   exit -1
 fi
+
+
+if [ "x$outputdir" == "x" ] ; then
+  outputdir="."
+fi
+
+if [[ ! -d "$outputdir" ]] ; then
+  echo "outputdir not found ($outputdir)"
+  exit -1
+fi
+
+
 
 output="custom-debian-iso-${isoname}-11.0.0-amd64.iso"
 
@@ -112,6 +124,7 @@ done
 ./bin/create-uefi-menu.sh -i "${serverdir}/isolinux" -u "${serverdir}/boot/grub"
 
 /bin/echo -n "Creating the iso..."
+isooutput="${outputdir}/custom-debian-iso-${isoname}-11.0.0-amd64.iso"
 ./bin/create-iso.sh -i "${isoname}" -s "$serverdir" >> "${logfile}" 2>&1
 /bin/echo  "done."
 
