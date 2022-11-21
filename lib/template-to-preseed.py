@@ -43,7 +43,7 @@ if opts.packages:
     with open(opts.packages, 'r') as f:
         packagesinfo = json.load(f)
 
-packagesinfo = {}
+support = {}
 if opts.support:
     with open(opts.support, 'r') as f:
         support = json.load(f)

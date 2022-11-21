@@ -175,7 +175,7 @@ d-i partman-auto/expert_recipe string                         \
                       $lvmok{ }                               \
                       method{ format } format{ }              \
                       use_filesystem{ } filesystem{ ext4 }    \
-                      mountpoint{ /backup0 }                      \
+                      mountpoint{ /backup }                   \
               .                                               \
               8000 8000 200% linux-swap                       \
                       $lvmok{ }                               \
