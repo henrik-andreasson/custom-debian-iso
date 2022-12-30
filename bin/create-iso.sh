@@ -2,7 +2,7 @@
 
 date_ts=$(date +"%Y-%m-%d_%H.%M.%S")
 
-while getopts i:v:s: flag; do
+while getopts i:o:s: flag; do
   case $flag in
     i) isoname="$OPTARG";
       ;;
