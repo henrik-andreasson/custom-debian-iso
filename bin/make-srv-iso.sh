@@ -23,7 +23,7 @@ while getopts n:s:c:o: flag; do
   esac
 done
 
-if [[ "x${ISONAME}" == "x" ]]; then
+if [[ "x${ISONAME}" != "x" ]]; then
   isoname="${ISONAME}"
 
 elif [[ "x$isoname" == "x" ]] ; then
@@ -31,7 +31,7 @@ elif [[ "x$isoname" == "x" ]] ; then
 
 fi
 
-if [[ "x${SERVERDIR}" == "x" ]]; then
+if [[ "x${SERVERDIR}" != "x" ]]; then
   serverdir="${SERVERDIR}"
 
 elif [[ "x$serverdir" == "x" ]] ; then
