@@ -137,7 +137,7 @@ done
 
 /bin/echo -n "Creating the iso..."
 isooutput="${outputdir}/custom-debian-iso-${isoname}-11.0.0-amd64.iso"
-./bin/create-iso.sh -i "${isoname}" -s "$serverdir" >> "${logfile}" 2>&1
+./bin/create-iso.sh -i "${isoname}" -s "$serverdir" -o "${isooutput}" >> "${logfile}" 2>&1
 /bin/echo  "done."
 
-echo "Iso: ${isoname} is in output: ${output}"
+echo "Iso: ${isoname} is in output: ${isooutput}"
