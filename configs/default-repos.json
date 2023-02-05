@@ -1,11 +1,3 @@
 {
   "postinstall": "current",
-  "server": "2022-06-06",
-  "ejbca": "6.3.1.1",
-  "wildfly": "9.0.2",
-  "csapps": "2022-10",
-  "luna10": "10.4.1",
-  "temurin": "2022-06-06",
-  "support": "2022-05",
-  "filebeat": "2022-09-10"
 }
