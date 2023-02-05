@@ -22,7 +22,11 @@ echo "done."
 
 for reponame in "${reponames[@]}" ; do
   repoversion=$(jq ."$reponame" $repojson | tr -d '"')
-  echo "repo: $reponame $repoversion"
-  rsync --verbose --progress --recursive "repos/$reponame/$repoversion/" "$dest/repo-$reponame-$repoversion/"
+  if [ -f "repos/$reponame/$repoversion/Packages" -o "repos/$reponame/$repoversion/Packages.gz"  ] ; then
+    echo "repo: $reponame $repoversion"
+    rsync --verbose --progress --recursive "repos/$reponame/$repoversion/" "$dest/repo-$reponame-$repoversion/"
+  else
+    echo "repo has no Packages(.gz)"
+  fi
 done
 /bin/echo  "done."
