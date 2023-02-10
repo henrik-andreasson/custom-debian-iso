@@ -7,14 +7,14 @@ else
 	ISOLINUX_DIR="server/isolinux"
 fi
 
-
+DATESTR=$(date +"%Y-%m-%d")
 cat<<__EOF__>$ISOLINUX_DIR/csws.cfg
 
 menu hshift 4
 menu width 70
 include stdmenu.cfg
 
-menu title Custom Debian ISO installer beta 001
+menu title Custom Debian ISO installer beta ${DATESTR}
 
 LABEL local-boot
 	MENU LABEL Local boot - Abort install
@@ -31,10 +31,11 @@ for cfg in ${ISOLINUX_DIR}/preseed-*cfg ; do
 
 cat<<__EOF__>>$ISOLINUX_DIR/csws.cfg
 label
-	menu label ^Server $hostnamex
+	menu label ^$hostnamex
 	menu default
 	kernel /install.amd/vmlinuz
 	append auto=true priority=critical vga=788 initrd=/install.amd/initrd.gz --quiet file=/cdrom/isolinux/$filename
+
 __EOF__
 
 done

@@ -1,69 +1,143 @@
 #!/bin/bash
 
-logfile="$(mktemp -p /tmp logfile-XXXXXXX)"
-isoname=""
 date_ts=$(date +"%Y-%m-%d_%H.%M.%S")
+logfile="$(mktemp -p logs logfile-${date_ts}-XXXXXXX)"
+isoname=""
+serverdir=""
+configdir=""
 
-if [ "x$1" != "x" ] ; then
-  isoname=$1
-else
+while getopts n:s:c:o: flag; do
+  case $flag in
+    n) isoname="$OPTARG";
+      ;;
+    s) serverdir=$OPTARG;
+      ;;
+    c) configdir=$OPTARG;
+      ;;
+    o) outputdir=$OPTARG;
+      ;;
+
+    ?)
+      exit;
+      ;;
+  esac
+done
+
+if [[ "x${ISONAME}" != "x" ]]; then
+  isoname="${ISONAME}"
+
+elif [[ "x$isoname" == "x" ]] ; then
   isoname="snapshot-${date_ts}"
+
 fi
+
+if [[ "x${SERVERDIR}" != "x" ]]; then
+  serverdir="${SERVERDIR}"
+
+elif [[ "x$serverdir" == "x" ]] ; then
+  serverdir="server"
+
+fi
+
+if [[ ! -d "$serverdir" ]] ; then
+  echo "serverdir not found ($serverdir)"
+  exit -1
+fi
+
+if [[ "x${CONFIGDIR}" != "x" ]] ; then
+  configdir="${CONFIGDIR}"
+elif [[ "x$configdir" == "x" ]] ; then
+  configdir="configs"
+fi
+
+if [[ ! -d "$configdir" ]] ; then
+  echo "configdir not found ($configdir)"
+  exit -1
+fi
+
+if [[ "x$OUTDIR" != "x" ]] ; then
+  outputdir="${OUTDIR}"
+elif [[ "x$outputdir" == "x" ]] ; then
+
+  outputdir="."
+fi
+
+if [[ ! -d "$outputdir" ]] ; then
+  echo "outputdir not found ($outputdir)"
+  exit -1
+fi
+
+
 
 output="custom-debian-iso-${isoname}-11.0.0-amd64.iso"
 
 /bin/echo -n "Creating the postintall deb..."
-./make-deb-postinstall.sh  > "${logfile}" 2>&1
+./bin/make-deb-postinstall.sh  > "${logfile}" 2>&1
 /bin/echo  "done."
-
-mkdir -p "repos/postinstall/current/"
-cp debian-fat-postinstall_*.deb "repos/postinstall/current/"
+mkdir -p repos/postinstall/current
+cp debian-fat-postinstall*_amd64.deb repos/postinstall/current/
 (
-  cd "repos/postinstall/current/"
-  ../../../bin/create-repo.sh > "${logfile}" 2>&1
+  cd repos/postinstall/current/
+  ../../../bin/create-repo.sh >> "../../../${logfile}" 2>&1
 )
 
-/bin/echo -n "Updating the repos on the iso..."
-./copy-repos.sh repos.json server/ > "${logfile}" 2>&1
-cp lib/isolinux.cfg server/isolinux/
-cp lib/csws.cfg server/isolinux/
+/bin/echo -n "Updating common repos on the iso..."
+./bin/copy-repos.sh -j "${configdir}/repos.json" -s "${serverdir}" -r "/var/www/html/repos" >> "${logfile}" 2>&1
+cp lib/isolinux.cfg "${serverdir}/isolinux/"
+cp lib/csws.cfg "${serverdir}/isolinux/"
 /bin/echo  "done."
 
 /bin/echo -n  "Adding servers..."
-for server in configs/*server.json ; do
+for server in ${configdir}/*server.json ; do
 	servername=$(jq .hostname $server  | tr -d '"')
-	if [ -f "configs/$servername-packages.json" ] ; then
-		packages="configs/$servername-packages.json"
+  packages=""
+	if [ -f "${configdir}/$servername-packages.json" ] ; then
+    echo "Using ${configdir}/$servername-packages.json"
+		packages="${configdir}/$servername-packages.json"
 	else
-		packages="configs/packages.json"
+    echo "Using ${configdir}/default-packages.json ($servername)"
+		packages="${configdir}/default-packages.json"
 	fi
-  if [ -f "configs/$servername-repos.json" ] ; then
-		repos="configs/$servername-repos.json"
+  support=""
+  if [ -f "${configdir}/$servername-support.json" ] ; then
+		support="${configdir}/$servername-support.json"
 	else
-		repos="configs/repos.json"
+		support="${configdir}/default-support.json"
 	fi
-
-  network="configs/${servername}-network.json"
-	if [ ! -f $network ] ; then
-		echo "network file must exit: ${network}"
-		exit
+  if [ ! -f "${configdir}/$servername-network.json" ] ; then
+    continue
   fi
 
-  preseed="server/isolinux/preseed-$servername.cfg"
+	if [ ! -f "${configdir}/${servername}-network.json" ] ; then
+		echo "network file must exit: ${configdir}/${servername}-network.json"
+		exit
+	fi
 	python3 ./lib/template-to-preseed.py --packages "$packages" \
-     --server "$server" --network "${network}"  > "$preseed"
+    --server "$server" \
+    --support "$support" \
+    --network "${configdir}/${servername}-network.json" \
+    > "${serverdir}/isolinux/preseed-$servername.cfg"
+
 	echo "added server: $servername"
 
   /bin/echo -n "Updating the iso with server repos..."
-  ./bin/copy-repos.sh "${repos}" server/ > "${logfile}" 2>&1
+  if [ -f "${configdir}/${servername}-repos.json" ] ; then
+    ./bin/copy-repos.sh -j "${configdir}/${servername}-repos.json" -s "${serverdir}"  -r "/var/www/html/repos" >> "${logfile}" 2>&1
+  elif [ -f "${configdir}/default-repos.json" ] ; then
+    ./bin/copy-repos.sh -j "${configdir}/default-repos.json" -s "${serverdir}" -r "/var/www/html/repos" >> "${logfile}" 2>&1
+  else
+    echo "no repos config found, not: ${configdir}/${servername}-repos.json nor: ${configdir}/default-repos.json"
+  fi
   /bin/echo  "done."
 
 done
 
-./bin/create-isolinux-menu.sh
+./bin/create-isolinux-menu.sh "${serverdir}/isolinux"
+./bin/create-uefi-menu.sh -i "${serverdir}/isolinux" -u "${serverdir}/boot/grub"
 
 /bin/echo -n "Creating the iso..."
-./bin/create-iso.sh "${isoname}" > "${logfile}" 2>&1
+isooutput="${outputdir}/custom-debian-iso-${isoname}-11.0.0-amd64.iso"
+./bin/create-iso.sh -i "${isoname}" -s "$serverdir" -o "${isooutput}" >> "${logfile}" 2>&1
 /bin/echo  "done."
 
-echo "Iso: ${isoname} is in output: ${output}"
+echo "Iso: ${isoname} is in output: ${isooutput}"

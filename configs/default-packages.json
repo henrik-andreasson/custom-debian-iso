@@ -1,0 +1,29 @@
+{
+  "packages": [
+    "debian-fat-postinstall",
+    "ntp",
+    "zip",
+    "unzip",
+    "jq",
+    "wget",
+    "curl",
+    "lsof",
+    "rsync",
+    "tcpdump",
+    "vim",
+    "openssh-server",
+    "mariadb-server",
+    "net-tools",
+    "ansible",
+    "certservice-ansible",
+    "lunajcprovjava",
+    "lunacmu",
+    "lunacm",
+    "libcryptoki",
+    "configurator",
+    "multitoken",
+    "pedclient",
+    "temurin-8-jdk",
+    "gnupg2"
+  ]
+}
