@@ -16,43 +16,54 @@ output="custom-debian-iso-${isoname}-11.0.0-amd64.iso"
 ./make-deb-postinstall.sh  > "${logfile}" 2>&1
 /bin/echo  "done."
 
-cp debian-fat-postinstall_2021.06.22_amd64.deb repos/postinstall/current/
+mkdir -p "repos/postinstall/current/"
+cp debian-fat-postinstall_*.deb "repos/postinstall/current/"
 (
-  cd repos/postinstall/current/
-  ../../../create-repo.sh > "${logfile}" 2>&1
+  cd "repos/postinstall/current/"
+  ../../../bin/create-repo.sh > "${logfile}" 2>&1
 )
 
 /bin/echo -n "Updating the repos on the iso..."
 ./copy-repos.sh repos.json server/ > "${logfile}" 2>&1
-cp isolinux.cfg wrk/isolinux/
-cp csws.cfg wrk/isolinux/
+cp lib/isolinux.cfg server/isolinux/
+cp lib/csws.cfg server/isolinux/
 /bin/echo  "done."
 
 /bin/echo -n  "Adding servers..."
-for server in *server.json ; do
+for server in configs/*server.json ; do
 	servername=$(jq .hostname $server  | tr -d '"')
-	if [ -f "$servername-packages.json" ] ; then
-		packages="$servername-packages.json"
+	if [ -f "configs/$servername-packages.json" ] ; then
+		packages="configs/$servername-packages.json"
 	else
-		packages="packages.json"
+		packages="configs/packages.json"
 	fi
-	if [ ! -f "${servername}-network.json" ] ; then
-		echo "network file must exit: ${servername}-network.json"
+  if [ -f "configs/$servername-repos.json" ] ; then
+		repos="configs/$servername-repos.json"
+	else
+		repos="configs/repos.json"
+	fi
+
+  network="configs/${servername}-network.json"
+	if [ ! -f $network ] ; then
+		echo "network file must exit: ${network}"
 		exit
-	fi
-	python3 ./template-to-preseed.py --packages "$packages" --server "$server" --network "${servername}-network.json"  > "server/isolinux/preseed-$servername.cfg"
+  fi
+
+  preseed="server/isolinux/preseed-$servername.cfg"
+	python3 ./lib/template-to-preseed.py --packages "$packages" \
+     --server "$server" --network "${network}"  > "$preseed"
 	echo "added server: $servername"
 
   /bin/echo -n "Updating the iso with server repos..."
-  ./copy-repos.sh "${servername}-repos.json" server/ > "${logfile}" 2>&1
+  ./bin/copy-repos.sh "${repos}" server/ > "${logfile}" 2>&1
   /bin/echo  "done."
 
 done
 
-./create-isolinux-menu.sh
+./bin/create-isolinux-menu.sh
 
 /bin/echo -n "Creating the iso..."
-./create-iso.sh "${isoname}" > "${logfile}" 2>&1
+./bin/create-iso.sh "${isoname}" > "${logfile}" 2>&1
 /bin/echo  "done."
 
 echo "Iso: ${isoname} is in output: ${output}"

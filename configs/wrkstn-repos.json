@@ -1,0 +1,9 @@
+{
+  "postinstall": "current",
+  "cs_cli": "2021.12",
+  "atom": "1.59",
+  "temurin_8_jdk": "2022-02-20",
+  "temurin_11_jdk": "2022-02-20",
+  "pritunl": "2021-06-08",
+  "sac": "10.7.77"
+}

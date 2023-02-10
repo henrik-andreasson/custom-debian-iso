@@ -15,7 +15,7 @@ fi
 mapfile -t reponames < <(jq -r 'keys[]' $repojson)
 
 for reponame in "${reponames[@]}" ; do
-  repoversion=$(jq ."$reponame" $repojson | tr -d '"')
+  repoversion=$(jq ".${reponame}" $repojson | tr -d '"')
   echo "repo: $reponame $repoversion"
   rsync --verbose --progress --recursive "repos/$reponame/$repoversion/" "$dest/repo-$reponame-$repoversion/"
 done

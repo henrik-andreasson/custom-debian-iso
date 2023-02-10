@@ -26,18 +26,10 @@ d-i netcfg/choose_interface select auto
 # Any hostname and domain names assigned from dhcp take precedence over
 # values set here. However, setting the values still prevents the questions
 # from being shown, even if values come from dhcp.
-#d-i netcfg/get_hostname string cs-install
-#d-i netcfg/get_domain string cs-adminnet
 
-d-i netcfg/disable_autoconfig boolean true
-d-i netcfg/get_nameservers  string {% if server_name_server1 %}{{ server_name_server1 }}{% endif %} {% if server_name_server2 %}{{ server_name_server2 }}{% endif %} {% if server_name_server3 %}{{ server_name_server3 }}{% endif %} 164.9.196.55 164.9.196.5
-
-d-i netcfg/get_ipaddress    string {{ server_ipaddress }} {{server_ip_address}}
-d-i netcfg/get_netmask      string {{ net_netmask }}
-d-i netcfg/get_gateway      string {{ net_gateway }}
-d-i netcfg/confirm_static   boolean true
-d-i netcfg/get_hostname string {{short_hostname}}
-d-i netcfg/get_domain string {{domainname}}
+d-i netcfg/disable_autoconfig boolean false
+d-i netcfg/get_hostname string cs-wrkstation
+d-i netcfg/get_domain string admin.crtsrv.se
 
 d-i hw-detect/load_firmware boolean true
 
@@ -64,19 +56,16 @@ d-i mirror/http/proxy string
 d-i passwd/root-login boolean true
 
 # test PW=foo123
-d-i passwd/root-password-crypted password lpXqZe4zkGzfg
-
-# d-i passwd/root-password-crypted password $6$/WbYkxT9w$H2a5zg2OTXys7KQ0e3.3tZaFjHMh7VSMlzZr75RMjTNIh7ZHoTlVF4cC3TDLm5R3woGN/.iTxfYFIawD2x/Fg1
+d-i passwd/root-password-crypted password E/XaUstE/DYsM
 
 # Alternatively, to skip creation of a normal user account.
-d-i passwd/make-user boolean false
+d-i passwd/make-user boolean true
 
 # To create a normal user account.
-#d-i passwd/user-fullname string Default user
-#d-i passwd/username string han
-# Normal user's password, either in clear text
-#d-i passwd/user-password password foo123
-#d-i passwd/user-password-again password foo123
+d-i passwd/user-fullname string cs
+d-i passwd/username string cs
+# test PW=foo123
+d-i passwd/user-password-crypted password E/XaUstE/DYsM
 
 ### Clock and time zone setup
 # Controls whether or not the hardware clock is set to UTC.
@@ -95,7 +84,7 @@ d-i clock-setup/ntp-server string ntp.wm.net
 ## Partitioning example
 # If the system has free space you can choose to only partition that space.
 # This is only honoured if partman-auto/method (below) is not set.
-#d-i partman-auto/init_automatically_partition select biggest_free
+d-i partman-auto/init_automatically_partition select biggest_free
 
 # Alternatively, you may specify a disk to partition. If the system has only
 # one disk the installer will default to using that, but otherwise the device
@@ -128,44 +117,6 @@ d-i partman-auto/choose_recipe select atomic
 d-i     partman-auto-lvm/guided_size    string  80%
 d-i		   partman-auto/choose_recipe	   csdisk
 
-#             disk size numbers in mb:  minimum prio    max
-d-i partman-auto/expert_recipe string                         \
-      boot-root ::                                            \
-              2000 2000 3000 ext4                                 \
-                      $primary{ }                             \
-                      $bootable{ }                            \
-                      method{ format } format{ }              \
-                      use_filesystem{ } filesystem{ ext4 }    \
-                      mountpoint{ /boot }                     \
-              .                                               \
-              2000 30000 40000 ext4                          \
-                      $lvmok{ }                               \
-                      method{ format } format{ }              \
-                      use_filesystem{ } filesystem{ ext4 }    \
-                      mountpoint{ / }                         \
-              .                                               \
-              1000 10000 10000 ext4                            \
-                      $lvmok{ }                               \
-                      method{ format } format{ }              \
-                      use_filesystem{ } filesystem{ ext4 }    \
-                      mountpoint{ /var }                      \
-              .                                               \
-              1000 10000 20000 ext4                            \
-                      $lvmok{ }                               \
-                      method{ format } format{ }              \
-                      use_filesystem{ } filesystem{ ext4 }    \
-                      mountpoint{ /var/lib/mysql }                      \
-              .                                               \
-              1000 2000 30000 ext4                            \
-                      $lvmok{ }                               \
-                      method{ format } format{ }              \
-                      use_filesystem{ } filesystem{ ext4 }    \
-                      mountpoint{ /var/log }                      \
-              .                                               \
-              8000 8000 200% linux-swap                       \
-                      $lvmok{ }                               \
-                      method{ swap } format{ }                \
-              .
 
 # This makes partman automatically partition without confirmation, provided
 # that you told it what to do using one of the methods above.
@@ -213,11 +164,28 @@ tasksel tasksel/first select standard
 
 # Individual additional packages to install
 
+
 d-i pkgsel/include string ntp \
 {% for pkg in packages %}
 {{pkg}} \
 {% endfor %}
                           zip
+#libcryptoki
+#vtl
+#vkd
+#pedClient
+#pciutils
+#lunajcprov
+#lunadiag
+#lunacmu
+#lunacm
+#libshim
+#configurator
+#cklog
+#ckdemo
+#ckSample
+# syscheck
+
 
 # Whether to upgrade packages after debootstrap.
 # Allowed values: none, safe-upgrade, full-upgrade

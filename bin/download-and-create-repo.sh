@@ -2,6 +2,16 @@
 
 PACKAGES="ansible ansible-doc"
 
+if [ "x$1" != "x" ] ; then
+	pkginput="$1"
+	if [ -f "${pkginput}" ] ; then
+			PACKAGES=$(cat "${pkginput}")
+	else
+		PACKAGES="${pkginput}"
+	fi
+fi
+
+
 for pkg in ${PACKAGES} ; do
   echo "downloading $pkg"
   apt-get download "$pkg"
@@ -18,4 +28,3 @@ done
 
 #from pkg: dpkg-dev
 dpkg-scanpackages -m . | gzip -c > Packages.gz
-

@@ -1,0 +1,6 @@
+*.iso
+*.deb
+repos/*
+server/*
+workstation/*
+wrkstn/*
