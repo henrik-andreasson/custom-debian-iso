@@ -129,7 +129,8 @@ for server in ${configdir}/*server.json ; do
     echo "no repos config found, not: ${configdir}/${servername}-repos.json nor: ${configdir}/default-repos.json"
   fi
   /bin/echo  "done."
-
+  #TODO: as an option
+  cp /opt/custom-debian-iso/trusted-services-archive.gpg "${serverdir}"
 done
 
 ./bin/create-isolinux-menu.sh "${serverdir}/isolinux"
