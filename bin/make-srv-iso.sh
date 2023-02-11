@@ -82,12 +82,14 @@ cp debian-fat-postinstall*_amd64.deb repos/postinstall/current/
 )
 
 /bin/echo -n "Updating common repos on the iso..."
+rm -rf "${serverdir}/repo-*"
 ./bin/copy-repos.sh -j "${configdir}/repos.json" -s "${serverdir}" -r "/var/www/html/repos" >> "${logfile}" 2>&1
 cp lib/isolinux.cfg "${serverdir}/isolinux/"
 cp lib/csws.cfg "${serverdir}/isolinux/"
 /bin/echo  "done."
 
 /bin/echo -n  "Adding servers..."
+rm -rf "${serverdir}/isolinux/preseed-*.cfg"
 for server in ${configdir}/*server.json ; do
 	servername=$(jq .hostname $server  | tr -d '"')
   packages=""
