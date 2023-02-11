@@ -83,7 +83,7 @@ cp debian-fat-postinstall*_amd64.deb repos/postinstall/current/
 
 /bin/echo -n "Updating common repos on the iso..."
 rm -rf "${serverdir}/repo-*"
-./bin/copy-repos.sh -j "${configdir}/repos.json" -s "${serverdir}" -r "/var/www/html/repos" >> "${logfile}" 2>&1
+./bin/copy-repos.sh -j "${configdir}/repos.json" -s "${serverdir}" -r "/var/www/html/repo" >> "${logfile}" 2>&1
 cp lib/isolinux.cfg "${serverdir}/isolinux/"
 cp lib/csws.cfg "${serverdir}/isolinux/"
 /bin/echo  "done."
@@ -124,9 +124,9 @@ for server in ${configdir}/*server.json ; do
 
   /bin/echo -n "Updating the iso with server repos..."
   if [ -f "${configdir}/${servername}-repos.json" ] ; then
-    ./bin/copy-repos.sh -j "${configdir}/${servername}-repos.json" -s "${serverdir}"  -r "/var/www/html/repos" >> "${logfile}" 2>&1
+    ./bin/copy-repos.sh -j "${configdir}/${servername}-repos.json" -s "${serverdir}"  -r "/var/www/html/repo" >> "${logfile}" 2>&1
   elif [ -f "${configdir}/default-repos.json" ] ; then
-    ./bin/copy-repos.sh -j "${configdir}/default-repos.json" -s "${serverdir}" -r "/var/www/html/repos" >> "${logfile}" 2>&1
+    ./bin/copy-repos.sh -j "${configdir}/default-repos.json" -s "${serverdir}" -r "/var/www/html/repo" >> "${logfile}" 2>&1
   else
     echo "no repos config found, not: ${configdir}/${servername}-repos.json nor: ${configdir}/default-repos.json"
   fi
