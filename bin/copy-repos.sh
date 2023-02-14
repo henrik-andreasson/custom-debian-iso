@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-while getopts j:r:s: flag; do
+while getopts j:r:s:f: flag; do
   case $flag in
     j) jsonconfig="$OPTARG";
       ;;
@@ -42,9 +42,11 @@ echo "done."
 
 for reponame in "${reponames[@]}" ; do
   repoversion=$(jq ."$reponame" $repojson | tr -d '"')
-  if [ -f "$repos/$reponame/$repoversion/Packages" -o "$repos/$reponame/$repoversion/Packages.gz"  ] ; then
+  if [ -f "$repos/$reponame/$repoversion/Packages" -o -f "$repos/$reponame/$repoversion/Packages.gz"  ] ; then
     echo "repo: $reponame $repoversion"
     rsync --verbose --progress --recursive "$repos/$reponame/$repoversion/" "$dest/repo-$reponame-$repoversion/"
+    rm -rf "$dest/repo-$reponame-$repoversion/Release.gpg" "$dest/repo-$reponame-$repoversion/InRelease"
+
   else
     echo "repo has no Packages(.gz)"
   fi
