@@ -81,8 +81,13 @@ cp debian-fat-postinstall*_amd64.deb repos/postinstall/current/
   ../../../bin/create-repo.sh >> "../../../${logfile}" 2>&1
 )
 
+/bin/echo -n "Removing old repos from the iso..."
+for repo in "${serverdir}/repo-"* ; do
+  rm -rf $repo
+done
+/bin/echo  "done."
+
 /bin/echo -n "Updating common repos on the iso..."
-rm -rf "${serverdir}/repo-*"
 ./bin/copy-repos.sh -j "${configdir}/repos.json" -s "${serverdir}" -r "/var/www/html/repo" >> "${logfile}" 2>&1
 cp lib/isolinux.cfg "${serverdir}/isolinux/"
 cp lib/csws.cfg "${serverdir}/isolinux/"
@@ -98,8 +103,11 @@ done
 /bin/echo "done"
 
 
+/bin/echo -n  "Cleaning out old servers..."
+rm -rf "${serverdir}/isolinux/preseed-"*".cfg"
+/bin/echo "done"
+
 /bin/echo -n  "Adding servers..."
-rm -rf "${serverdir}/isolinux/preseed-*.cfg"
 for server in ${configdir}/*server.json ; do
 	servername=$(jq .hostname $server  | tr -d '"')
   packages=""
