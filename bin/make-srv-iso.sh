@@ -88,6 +88,16 @@ cp lib/isolinux.cfg "${serverdir}/isolinux/"
 cp lib/csws.cfg "${serverdir}/isolinux/"
 /bin/echo  "done."
 
+/bin/echo -n  "Checking json formatting of config..."
+for file in ${configdir}/*json ; do
+  cat $file | jq . >/dev/null 2>&1
+  if [ $? -ne 0 ] ; then
+    echo "file: $file not passing json parsing"
+  fi
+done
+/bin/echo "done"
+
+
 /bin/echo -n  "Adding servers..."
 rm -rf "${serverdir}/isolinux/preseed-*.cfg"
 for server in ${configdir}/*server.json ; do
