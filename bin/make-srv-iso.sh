@@ -83,6 +83,7 @@ cp debian-fat-postinstall*_amd64.deb repos/postinstall/current/
 
 /bin/echo -n "Removing old repos from the iso..."
 for repo in "${serverdir}/repo-"* ; do
+  echo "repo: $repo"
   rm -rf $repo
 done
 /bin/echo  "done."
@@ -104,7 +105,10 @@ done
 
 
 /bin/echo -n  "Cleaning out old servers..."
-rm -rf "${serverdir}/isolinux/preseed-"*".cfg"
+for preseed in "${serverdir}/isolinux/preseed-"*".cfg" ; do
+  echo "preseed: ${preseed}"
+  rm -rf "${preseed}"
+done
 /bin/echo "done"
 
 /bin/echo -n  "Adding servers..."
