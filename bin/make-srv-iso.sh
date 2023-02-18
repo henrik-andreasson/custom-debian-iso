@@ -146,9 +146,9 @@ for server in ${configdir}/*server.json ; do
 
   /bin/echo -n "Updating the iso with server repos..."
   if [ -f "${configdir}/${servername}-repos.json" ] ; then
-    ./bin/copy-repos.sh -j "${configdir}/${servername}-repos.json" -s "${serverdir}"  -r "/var/www/html/repo" >> "${logfile}" 2>&1
+    ./bin/copy-repos.sh -j "${configdir}/${servername}-repos.json" -s "${serverdir}"  -r "/var/www/html/repo" 2>> "${logfile}"
   elif [ -f "${configdir}/default-repos.json" ] ; then
-    ./bin/copy-repos.sh -j "${configdir}/default-repos.json" -s "${serverdir}" -r "/var/www/html/repo" >> "${logfile}" 2>&1
+    ./bin/copy-repos.sh -j "${configdir}/default-repos.json" -s "${serverdir}" -r "/var/www/html/repo" 2>> "${logfile}"
   else
     echo "no repos config found, not: ${configdir}/${servername}-repos.json nor: ${configdir}/default-repos.json"
   fi

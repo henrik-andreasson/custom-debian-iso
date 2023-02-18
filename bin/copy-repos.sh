@@ -43,8 +43,10 @@ echo "done."
 for reponame in "${reponames[@]}" ; do
   repoversion=$(jq ."$reponame" $repojson | tr -d '"')
   if [ -f "$repos/$reponame/$repoversion/Packages" -o -f "$repos/$reponame/$repoversion/Packages.gz"  ] ; then
-    echo "repo: $reponame $repoversion"
-    rsync --verbose --progress --recursive "$repos/$reponame/$repoversion/" "$dest/repo-$reponame-$repoversion/"
+    echo "adding repo: $reponame $repoversion"
+    rsync --verbose --progress --recursive "$repos/$reponame/$repoversion/" "$dest/repo-$reponame-$repoversion/" >&2
+
+    # TODO: work around for problems getting our gpg key into the iso
     rm -rf "$dest/repo-$reponame-$repoversion/Release.gpg" "$dest/repo-$reponame-$repoversion/InRelease"
 
   else
