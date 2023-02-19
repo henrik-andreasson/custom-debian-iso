@@ -166,4 +166,5 @@ isooutput="${outputdir}/custom-debian-iso-${isoname}-11.0.0-amd64.iso"
 /bin/echo  "done."
 
 echo "Iso: ${isoname} is in output: ${isooutput}" | tee -a "${logfile}"
+echo "${isoname}"
 echo "${isoname}" > name-of-last-built-iso.txt
