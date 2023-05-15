@@ -99,6 +99,7 @@ d-i clock-setup/ntp-server string {% for item in support_ntp_server %}{{item}} {
 # If the system has free space you can choose to only partition that space.
 # This is only honoured if partman-auto/method (below) is not set.
 #d-i partman-auto/init_automatically_partition select biggest_free
+d-i partman-auto/init_automatically_partition select Guided - use entire disk
 
 # Alternatively, you may specify a disk to partition. If the system has only
 # one disk the installer will default to using that, but otherwise the device
@@ -106,6 +107,7 @@ d-i clock-setup/ntp-server string {% for item in support_ntp_server %}{{item}} {
 # /dev/sda, and not e.g. /dev/discs/disc0/disc).
 # For example, to use the first SCSI/SATA hard disk:
 #d-i partman-auto/disk string /dev/sda
+d-i partman-auto/disk string /dev/$(lsblk -lbn --output SIZE,NAME | sort -n | tail -n 1 | cut -d" " -f2)"
 # In addition, you'll need to specify the method to use.
 # The presently available methods are:
 # - regular: use the usual partition types for your architecture
@@ -122,6 +124,8 @@ d-i partman-md/device_remove_md boolean true
 # And the same goes for the confirmation to write the lvm partitions.
 d-i partman-lvm/confirm boolean true
 d-i partman-lvm/confirm_nooverwrite boolean true
+
+d-i partman-auto/purge_lvm_from_device boolean true
 
 # You can choose one of the three predefined partitioning recipes:
 # - atomic: all files in one partition
