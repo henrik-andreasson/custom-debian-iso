@@ -1,0 +1,11 @@
+{
+  "ntp_server": [
+    "ntp.domain.com",
+    "ntp2.domain.com",
+    "ntp3.domain.com"
+  ],
+  "dns_server": [
+    "8.8.8.8",
+    "1.1.1.1"
+  ]
+}

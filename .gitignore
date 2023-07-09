@@ -8,3 +8,4 @@ bin/inventorpy-cli/.token
 bin/inventorpy-cli/cacerts.pem
 bin/inventorpy-cli/variables
 *.gz
+not-used
