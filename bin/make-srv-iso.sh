@@ -67,8 +67,6 @@ if [[ ! -d "$outputdir" ]] ; then
   exit -1
 fi
 
-
-
 output="custom-debian-iso-${isoname}-11.0.0-amd64.iso"
 
 /bin/echo -n "Creating the postintall deb..."
@@ -157,8 +155,10 @@ for server in ${configdir}/*server.json ; do
   cp /opt/custom-debian-iso/trusted-services-archive.gpg "${serverdir}"
 done
 
+/bin/echo -n "Creating boot menu:s..."
 ./bin/create-isolinux-menu.sh "${serverdir}/isolinux"
 ./bin/create-uefi-menu.sh -i "${serverdir}/isolinux" -u "${serverdir}/boot/grub"
+/bin/echo  "done."
 
 /bin/echo -n "Creating the iso..."
 isooutput="${outputdir}/custom-debian-iso-${isoname}-11.0.0-amd64.iso"
