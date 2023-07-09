@@ -7,15 +7,17 @@ isoname=""
 wrkstndir=""
 configdir=""
 
-while getopts n:w:c:o: flag; do
+while getopts n:w:c:o:r: flag; do
   case $flag in
-    n) ISONAME="$OPTARG";
+    n) isoname="$OPTARG";
       ;;
-    w) WRKSTNDIR=$OPTARG;
+    w) wrkstndir=$OPTARG;
       ;;
-    c) CONFIGDIR=$OPTARG;
+    c) configdir=$OPTARG;
       ;;
-    o) OUTDIR=$OPTARG;
+    o) outputdir=$OPTARG;
+      ;;
+    r) repodir=$OPTARG;
       ;;
 
     ?)
@@ -24,72 +26,97 @@ while getopts n:w:c:o: flag; do
   esac
 done
 
+# env var takes presedence over command line argumants
 if [[ "x${ISONAME}" != "x" ]]; then
+  echo "using isoname from env var ${ISONAME}"
   isoname="${ISONAME}"
 
-elif [[ "x$isoname" == "x" ]] ; then
+elif [[ "x$isoname" != "x" ]] ; then
+  echo "using isoname from cli arg  ${isoname}"
+
+else
   isoname="snapshot-${date_ts}"
+  echo "using isoname: ${isoname} (no cli or env was supplied)"
+
 
 fi
 
+# env var takes presedence over command line argumants
 if [[ "x${WRKSTNDIR}" != "x" ]]; then
+  echo "using wrkstndir from env var ${WRKSTNDIR}"
   wrkstndir="${WRKSTNDIR}"
 
-elif [[ "x$srkstndir" == "x" ]] ; then
+elif [[ "x$wrkstndir" != "x" ]] ; then
+  echo "using wrkstndir from cli arg ${wrkstndir}"
+
+else
   wrkstndir="wrkstn"
+  echo "using wrkstndir default ${wrkstndir} no cli arg nor env supplied"
 
 fi
 
-if [[ ! -d "$wrkstndir" ]] ; then
-  echo "wrkstndir not found ($wrkstndir)"
-  exit -1
-fi
 
 if [[ "x${CONFIGDIR}" != "x" ]] ; then
   configdir="${CONFIGDIR}"
-elif [[ "x$configdir" == "x" ]] ; then
-  configdir="configs"
-fi
+  echo "using configdir fron end ${configdir}"
 
-if [[ ! -d "$configdir" ]] ; then
-  echo "configdir not found ($configdir)"
-  exit -1
+elif [[ "x$configdir" != "x" ]] ; then
+  echo "using configdir fron cli ${configdir}"
+
+else
+  configdir="configs"
+  echo "using configdir default ${configdir} no cli arg nor env supplied"
+
 fi
 
 if [[ "x$OUTDIR" != "x" ]] ; then
   outputdir="${OUTDIR}"
-elif [[ "x$outputdir" == "x" ]] ; then
+  echo "using outputdir from env ${outputdir}"
 
+elif [[ "x$outputdir" != "x" ]] ; then
+  echo "using outputdir from cli arg ${outputdir}"
+
+else
   outputdir="."
+  echo "using outputdir default ${outputdir}"
+
 fi
 
-if [[ ! -d "$outputdir" ]] ; then
-  echo "outputdir not found ($outputdir)"
-  exit -1
+if [[ "x$REPODIR" != "x" ]] ; then
+  repodir="${REPODIR}"
+  echo "using repodir from env ${repodir}"
+
+elif [[ "x$repodir" != "x" ]] ; then
+  echo "using outputdir from cli arg ${repodir}"
+
+else
+  repodir="repos"
+  echo "using repodir default ${repodir}"
+
 fi
 
 output="custom-debian-iso-${isoname}-11.0.0-amd64.iso"
 
-/bin/echo -n "Creating the postintall deb..."
-./bin/make-deb-postinstall.sh  > "${logfile}" 2>&1
-/bin/echo  "done."
-mkdir -p repos/postinstall/current
-cp debian-fat-postinstall*_amd64.deb repos/postinstall/current/
-(
-  cd repos/postinstall/current/
-  ../../../bin/create-repo.sh > "${logfile}"
-)
-
 /bin/echo -n "Removing old repos from the iso..."
-for repo in "${serverdir}/repo-"* ; do
+for repo in "${wrkstndir}/repo-"* ; do
   echo "repo: $repo"
   rm -rf $repo
 done
 /bin/echo  "done."
 
+/bin/echo -n "Creating the postintall deb..."
+./bin/make-deb-postinstall.sh  > "${logfile}" 2>&1
+mkdir -p "${repodir}/wrkstnpostinstall/current"
+cp debian-fat-postinstall*_amd64.deb "${repodir}/wrkstnpostinstall/current/"
+(
+  cd "${repodir}/wrkstnpostinstall/current/"
+  ../../../bin/create-repo.sh > "${logfile}"
+)
+/bin/echo  "done."
+
 /bin/echo -n "Updating the repos on the iso..."
-./bin/copy-repos.sh configs/workstation.json workstation/ > "${logfile}" 2>&1
-./bin/copy-repos.sh -j "${configdir}/repos.json" -s "${wrkstndir}" -r "/var/www/html/repo" >> "${logfile}" 2>&1
+./bin/copy-repos.sh -j "configs/postinst-repo.json" -s "${wrkstndir}" -r "${repodir}" >> "${logfile}"
+./bin/copy-repos.sh -j "${configdir}/repos.json"    -s "${wrkstndir}" -r "${repodir}" >> "${logfile}"
 cp lib/isolinux.cfg "${wrkstndir}/isolinux/"
 cp lib/csws.cfg "${wrkstndir}/isolinux/"
 /bin/echo  "done."
@@ -128,7 +155,7 @@ isooutput="${outputdir}/custom-debian-iso-${isoname}-11.0.0-amd64.iso"
 /bin/echo  "done."
 
 echo "Iso: ${isoname} is at:"
-echo "${output}"
+echo "${isooutput}"
 echo "${isoname}" > name-of-last-built-iso.txt
 
 echo "Logfile: ${logfile}"
