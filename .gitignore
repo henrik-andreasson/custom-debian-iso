@@ -9,3 +9,5 @@ bin/inventorpy-cli/cacerts.pem
 bin/inventorpy-cli/variables
 *.gz
 not-used
+logs/*
+name-of-last-built-iso.txt
