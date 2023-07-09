@@ -50,7 +50,7 @@ for reponame in "${reponames[@]}" ; do
     rm -rf "$dest/repo-$reponame-$repoversion/Release.gpg" "$dest/repo-$reponame-$repoversion/InRelease"
 
   else
-    echo "repo has no Packages(.gz)"
+    echo "repo ${reponame}/${repoversion} has no Packages(.gz)"
   fi
 done
 /bin/echo  "done."
