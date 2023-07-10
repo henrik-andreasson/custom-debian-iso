@@ -108,15 +108,12 @@ done
 ./bin/make-deb-postinstall.sh  > "${logfile}" 2>&1
 mkdir -p "${repodir}/wrkstnpostinstall/current"
 cp debian-fat-postinstall*_amd64.deb "${repodir}/wrkstnpostinstall/current/"
-(
-  cd "${repodir}/wrkstnpostinstall/current/"
-  ../../../bin/create-repo.sh > "${logfile}"
-)
+./bin/create-repo.sh "${repodir}/wrkstnpostinstall/current/" | tee -a "${logfile}"
 /bin/echo  "done."
 
 /bin/echo -n "Updating the repos on the iso..."
-./bin/copy-repos.sh -j "configs/postinst-repo.json" -s "${wrkstndir}" -r "${repodir}" >> "${logfile}"
-./bin/copy-repos.sh -j "${configdir}/repos.json"    -s "${wrkstndir}" -r "${repodir}" >> "${logfile}"
+./bin/copy-repos.sh -j "configs/postinst-repo.json" -s "${wrkstndir}" -r "${repodir}" |tee -a "${logfile}"
+./bin/copy-repos.sh -j "${configdir}/repos.json"    -s "${wrkstndir}" -r "${repodir}" |tee -a "${logfile}"
 cp lib/isolinux.cfg "${wrkstndir}/isolinux/"
 cp lib/csws.cfg "${wrkstndir}/isolinux/"
 /bin/echo  "done."
