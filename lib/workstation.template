@@ -197,6 +197,10 @@ d-i pkgsel/upgrade select none
 # popular and include it on CDs.
 popularity-contest popularity-contest/participate boolean false
 
+# dont look for more dvd:s
+d-i apt-setup/cdrom/set-first boolean false
+d-i apt-setup/cdrom/set-next boolean false
+d-i apt-setup/cdrom/set-failed boolean false
 
 ### Boot loader installation
 # Grub is the default boot loader (for x86). If you want lilo installed
