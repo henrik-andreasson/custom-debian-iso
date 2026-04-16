@@ -1,0 +1,7 @@
+{
+  "postinstall": "current",
+  "acert": "20250901",
+  "debianserver": "20251206",
+  "temurin": "20251109",
+  "tomcat9": "20251126"
+}

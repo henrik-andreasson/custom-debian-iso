@@ -1,0 +1,11 @@
+{
+  "environment": null,
+  "gateway": "192.168.99.1",
+  "id": 23,
+  "location_id": 2,
+  "name": "ALAB",
+  "netmask": "255.255.255.0",
+  "network": "192.168.99.0",
+  "service_id": 1,
+  "vlan": "100"
+}

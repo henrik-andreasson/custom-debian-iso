@@ -106,7 +106,17 @@ d-i partman-auto/init_automatically_partition select Guided - use entire disk
 # name must be given in traditional, non-devfs format (so e.g. /dev/hda or
 # /dev/sda, and not e.g. /dev/discs/disc0/disc).
 # For example, to use the first SCSI/SATA hard disk:
-d-i partman-auto/disk string  /dev/sda /dev/vda /dev/xvda
+
+#d-i partman-auto/disk string  /dev/nvme0n1
+
+{% if server_root_device %}
+d-i partman-auto/disk string {{ server_root_device }}
+{% else %}
+# jinga2 variable root_device was not set, using default
+d-i partman-auto/disk string /dev/sda
+{% endif %}
+
+# d-i partman-auto/disk string  /dev/sda /dev/vda /dev/xvda
 
 #d-i partman-auto/disk string /dev/$(lsblk -lbn --output SIZE,NAME | sort -n | tail -n 1 | cut -d" " -f2)"
 # In addition, you'll need to specify the method to use.
@@ -143,6 +153,7 @@ d-i partman-auto-lvm/guided_size    string  80%
 #d-i partman-auto/expert_recipe_file string /hd-media/recipe
 
 #             disk size numbers in mb:  minimum prio    max
+
 d-i partman-auto/expert_recipe string                         \
       boot-root ::                                            \
               538 538 1075 free                                 \
@@ -244,14 +255,14 @@ d-i apt-setup/use_mirror boolean false
 d-i apt-setup/no_mirror boolean false
 
 tasksel tasksel/first select standard
-
+d-i tasksel/install string standard
 # Individual additional packages to install
 
-d-i pkgsel/include string ntp \
+d-i pkgsel/include string \
 {% for pkg in packages %}
 {{pkg}} \
 {% endfor %}
-                          zip
+zip
 
 # Whether to upgrade packages after debootstrap.
 # Allowed values: none, safe-upgrade, full-upgrade
@@ -279,7 +290,14 @@ d-i apt-setup/cdrom/set-failed boolean false
 # This is fairly safe to set, it makes grub install automatically to the MBR
 # if no other operating system is detected on the machine.
 d-i grub-installer/only_debian boolean true
+
+#d-i grub-installer/bootdev  string /dev/vda
+{% if server_root_device %}
+d-i grub-installer/bootdev  string {{ server_root_device }}
+{% else %}
+# jinga2 variable root_device was not set, using default
 d-i grub-installer/bootdev  string /dev/sda
+{% endif %}
 
 
 ### Finishing up the installation
@@ -301,8 +319,11 @@ d-i finish-install/reboot_in_progress note
 # This will power off the machine instead of just halting it.
 #d-i debian-installer/exit/poweroff boolean true
 
-#d-i apt-setup/local0/key string file:/cdrom/trusted-services-archive.gpg
-#d-i debian-installer/allow_unauthenticated boolean true
+#d-i apt-setup/local0/repository string [signed-by=/usr/share/keyrings/custom-repo.gpg] file:/cdrom/repo-acert-20250901
+#d-i apt-setup/local1/repository string [signed-by=/usr/share/keyrings/custom-repo.gpg] file:/cdrom/repo-debianpatch-20251005
+#d-i apt-setup/local2/repository string [signed-by=/usr/share/keyrings/custom-repo.gpg] file:/cdrom/postinstall-current
+
+d-i debian-installer/allow_unauthenticated boolean true
 
 #### Advanced options
 ### Running custom commands during the installation
@@ -313,6 +334,7 @@ d-i finish-install/reboot_in_progress note
 # here's a way to run any shell command you'd like inside the installer,
 # automatically.
 
+
 # This first command is run as early as possible, just after
 # preseeding is read.
 # d-i preseed/early_command string
@@ -321,6 +343,16 @@ d-i finish-install/reboot_in_progress note
 # of the disks (which may not be visible when preseed/early_command runs).
 #d-i partman/early_command \
 #       string debconf-set partman-auto/disk "$(list-devices disk | head -n1)"
+
+# Run a command early in the install process (before apt-setup)
+d-i preseed/early_command string \
+    mkdir -p /usr/share/keyrings; \
+    cp /cdrom/custom-repo.gpg /usr/share/keyrings/custom-repo.gpg
+
+# Run a command late in the install process, after /target is mounted
+d-i preseed/late_command string \
+    mkdir -p /target/usr/share/keyrings; \
+    cp /cdrom/custom-repo.gpg /target/usr/share/keyrings/custom-repo.gpg
 
 # todo looks like a interesting idea
 #d-i preseed/late_command string \
@@ -334,10 +366,44 @@ d-i finish-install/reboot_in_progress note
 # in-target sh -c 'eject || true'; \
 # rm -r /target/custom;
 # from https://github.com/coreprocess/linux-unattended-installation/blob/master/ubuntu/20.04/custom/preseed.cfg
+# The Debian installer will install on the first disk it finds which can
+# sometimes be the USB stick itself. Work around this by rolling our own auto
+# detect logic which disallows installing on USB devices.
+
+#d-i partman/early_command string \
+  # List all devices by ID that are of type 'disk', filter out common USB patterns (like 'usb-', 'removable', or large-capacity-disk names),
+  # and follow the symbolic link to get the actual device path (e.g., /dev/sda).
+  # We select the first entry that is NOT a USB stick.
+#  BOOTDEV_ID="$(find /dev/disk/by-id/ -type l -name '*-ata-*' -o -name '*-nvme-*' | head -n 1)"; \
+  # If an ATA/NVMe drive is found, use it. Readlink resolves the symlink to /dev/sdX
+ # if [ -n "$BOOTDEV_ID" ]; then \
+ #   BOOTDEV="$(readlink -f "$BOOTDEV_ID" | grep -o '/dev/[^/]*$')"; \
+  # Fallback: if no ATA/NVMe found, list all sd* devices and try to pick the largest one by name convention (risky, but sometimes necessary).
+#  else \
+    # Find the largest looking device name (e.g. sda) and append /dev/
+#    BOOTDEV="$(blkid | grep -o -E '/dev/sd[a-z]' | head -n 1)"; \
+#  fi; \
+  # If a valid device was found, proceed with setting debconf variables
+#  if [ -n "$BOOTDEV" ]; then \
+#    debconf-set partman-auto/disk "$BOOTDEV"; \
+#    debconf-set grub-installer/bootdev "$BOOTDEV"; \
+#  fi; \
+  # (Original logic to disable os-prober, kept for completeness)
+#  while /bin/true; do sleep 0.01; rm -f /target/etc/grub.d/30_os-prober; done &
+
+
+{% if install_custom_apt_gpg_key %}
+# Copy the GPG key from the mounted ISO (which is at /cdrom) to the
+# temporary /etc/apt/trusted.gpg.d/ directory within the installer.
+# NOTE: This uses the deprecated, but functional during install, 'trusted.gpg.d' location.
+d-i preseed/late_command string \
+  in-target cp /cdrom/custom-debian-apt-gpg-repo-key.gpg /etc/apt/trusted.gpg.d/
+{% endif %}
+
 
 # This command is run just before the install finishes, but when there is
 # still a usable /target directory. You can chroot to /target and use it
 # directly, or use the apt-install and in-target commands to easily install
 # packages and run commands in the target system.
 
-d-i preseed/late_command string in-target /opt/post-install/post-install.sh
+#d-i preseed/late_command string in-target /opt/post-install/post-install.sh

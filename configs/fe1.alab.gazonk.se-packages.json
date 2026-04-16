@@ -1,0 +1,30 @@
+{
+  "packages": [
+    "ntp",
+    "zip",
+    "unzip",
+    "jq",
+    "wget",
+    "curl",
+    "lsof",
+    "rsync",
+    "tcpdump",
+    "vim",
+    "openssh-server",
+    "mariadb-server",
+    "net-tools",
+    "ansible",
+    "lvm2",
+    "python3-pymysql",
+    "acert-admin",
+    "acert-public",
+    "acert-cli",
+    "acert-db-cli",
+    "syscheck",
+    "temurin-17-jdk",
+    "acert-activemq",
+    "tomcat9",
+    "tomcat9-user",
+    "apache2"
+  ]
+}

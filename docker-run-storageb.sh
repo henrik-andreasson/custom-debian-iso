@@ -8,7 +8,7 @@ docker build -t custom_debian_iso .
 docker run --rm -it \
     --entrypoint "/build/bin/make-srv-iso.sh" \
     --mount type=bind,source=/opt/custom-debian-iso/server/,target=/build/source \
-    --mount type=bind,source=/home/han/iso-and-repo/iso-ikea-szm/configs/,target=/build/configs \
+    --mount type=bind,source=/home/han/iso-and-repo/iso-storage-b/configs/,target=/build/configs \
     --mount type=bind,source=/opt/custom-debian-iso/iso/,target=//build/iso \
     --mount type=bind,source=/opt/repos/,target=/build/repos \
     custom_debian_iso \
@@ -16,5 +16,5 @@ docker run --rm -it \
     -o /build/iso/ \
     -r /build/repos \
     -c /build/configs \
-    -n acert-ikea-szm-2026v2
+    -n acert-storageb-2026v1
 #    -g /build/repos/custom-repo.gpg \

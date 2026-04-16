@@ -95,7 +95,7 @@ else
 
 fi
 
-output="custom-debian-iso-${isoname}-11.0.0-amd64.iso"
+output="custom-debian-iso-${isoname}.iso"
 
 /bin/echo -n "Removing old repos from the iso..."
 for repo in "${wrkstndir}/repo-"* ; do
@@ -147,7 +147,7 @@ cp lib/isolinux.cfg "${wrkstndir}/isolinux/"
 
 
 /bin/echo -n "Creating the iso..."
-isooutput="${outputdir}/custom-debian-iso-${isoname}-11.0.0-amd64.iso"
+isooutput="${outputdir}/custom-debian-iso-${isoname}.iso"
 ./bin/create-iso.sh -i "${isoname}" -s "${wrkstndir}"  -o "${isooutput}" >> "${logfile}" 2>&1
 /bin/echo  "done."
 

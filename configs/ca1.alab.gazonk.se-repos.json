@@ -1,0 +1,5 @@
+{
+  "postinstall": "current",
+  "acert": "20250901",
+  "debianserver": "20251206"
+}

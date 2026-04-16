@@ -1,0 +1,19 @@
+{
+  "comment": "",
+  "cpu": "4",
+  "environment": "LAB",
+  "hd": "60GB",
+  "hostname": "ca3.alab.gazonk.se",
+  "ip_address": "192.168.99.23",
+  "name_server1": "192.168.99.1",
+  "name_server2": "8.8.8.8",
+  "hosting_server_id": null,
+  "id": 120,
+  "memory": "8GB",
+  "network_id": 1,
+  "os_name": "debian",
+  "os_version": "13.1",
+  "role": "CA3",
+  "service_id": 1,
+  "status": "operation"
+}

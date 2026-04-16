@@ -1,5 +1,6 @@
 {
   "packages": [
+    "ntp",
     "zip",
     "unzip",
     "jq",
@@ -13,6 +14,11 @@
     "mariadb-server",
     "net-tools",
     "ansible",
-    "gnupg2"
+    "lvm2",
+    "python3-pymysql",
+    "acert-ejbcacomponents",
+    "ejbca",
+    "syscheck",
+    "wildfly"
   ]
 }

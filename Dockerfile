@@ -1,11 +1,11 @@
-FROM debian:bookworm
+FROM debian:trixie
 
 WORKDIR /build
 RUN apt-get update
 RUN apt-get upgrade -y
 RUN apt-get install --no-install-recommends -y \
     unzip  wget bash xorriso ruby ruby-rubygems jq python3 \
-    python3-jinja2 isolinux
+    python3-jinja2 isolinux rsync
 RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/*
 

@@ -1,6 +1,5 @@
 {
   "packages": [
-    "debian-fat-postinstall",
     "ntp",
     "zip",
     "unzip",
@@ -15,10 +14,12 @@
     "mariadb-server",
     "net-tools",
     "ansible",
-    "adoptopenjdk-8-hotspot",
     "lvm2",
-    "glusterfs-client",
-    "glusterfs-server",
-    "python3-pymysql"
+    "python3-pymysql",
+    "acert-ejbcacomponents",
+    "ejbca",
+    "syscheck",
+    "wildfly",
+    "openjdk-21-jre-headless"
   ]
 }

@@ -34,23 +34,23 @@ fi
 
 mapfile -t reponames < <(jq -r 'keys[]' $repojson)
 
-/bin/echo -n "Removing old repos..."
-rm -rf "$dest/repo-*"
-echo "done."
-
-/bin/echo -n "Updating the repos on the iso..."
-
 for reponame in "${reponames[@]}" ; do
   repoversion=$(jq ."$reponame" $repojson | tr -d '"')
-  if [ -f "$repos/$reponame/$repoversion/Packages" -o -f "$repos/$reponame/$repoversion/Packages.gz"  ] ; then
-    echo "adding repo: $reponame $repoversion"
+  if [ ! -d "$repos/$reponame/$repoversion" ] ; then
+      echo "repo ${repos}/${reponame}/${repoversion} does not exist"
+      continue
+  fi
+  packages_file=$(find "$repos/$reponame/$repoversion" -iname "Packages*" | head -n 1)
+
+  if [  -f "$packages_file" ] ; then
+    echo "    - adding repo: $reponame $repoversion"
     rsync --verbose --progress --recursive "$repos/$reponame/$repoversion/" "$dest/repo-$reponame-$repoversion/" >&2
 
     # TODO: work around for problems getting our gpg key into the iso
     rm -rf "$dest/repo-$reponame-$repoversion/Release.gpg" "$dest/repo-$reponame-$repoversion/InRelease"
 
   else
-    echo "repo ${reponame}/${repoversion} has no Packages(.gz)"
+    echo "repo ${repos}/${reponame}/${repoversion} has no Packages(.gz)"
+    ls -la "$repos/$reponame/$repoversion/"
   fi
 done
-/bin/echo  "done."

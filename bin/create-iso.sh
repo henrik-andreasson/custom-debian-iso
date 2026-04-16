@@ -22,7 +22,7 @@ if [ "x$isoname" = "x" ] ; then
 fi
 
 if [ "x$output" = "x" ] ; then
-  output="custom-debian-iso-${isoname}-11.0.0-amd64.iso"
+  output="custom-debian-iso-${isoname}.iso"
 fi
 
 if [ "x$source" = "x" ] ; then

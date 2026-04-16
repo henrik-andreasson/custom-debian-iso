@@ -65,7 +65,7 @@ Updating the repos on the iso...done.
 Creating the workstation preseed...done.
 Creating the iso...done.
 Iso: wrkstn-2022-07-14_12.39.32 is at:
-custom-debian-iso-wrkstn-2022-07-14_12.39.32-11.0.0-amd64.iso
+custom-debian-iso-wrkstn-2022-07-14_12.39.32.iso
 Logfile: /tmp/logfile-nIQLqap
 ```
 
@@ -76,5 +76,5 @@ Updating common repos on the iso...done.
 Adding servers...added server: rootca.at.crtsrv.se
 Updating the iso with server repos...done.
 Creating the iso...done.
-Iso: rootca is in output: custom-debian-iso-rootca-11.0.0-amd64.iso
+Iso: rootca is in output: custom-debian-iso-rootca.iso
 ```

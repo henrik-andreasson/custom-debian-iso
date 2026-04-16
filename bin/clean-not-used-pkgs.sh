@@ -1,6 +1,7 @@
 #!/bin/bash
 
 notused_pkgs="
+./pool/main/g/gnome-*
 ./pool/main/p/plasma-workspace/
 ./pool/main/o/open-gram/
 ./pool/main/e/evolution/
@@ -14,16 +15,6 @@ notused_pkgs="
 ./pool/main/c/chromium/
 ./pool/main/i/inkscape/
 ./pool/main/m/mate-*
-./g/gnucash-docs
-./t/texlive-extra
-./t/thunderbird
-./q/qtwebengine-opensource-src
-./g/gimp-help
-./libr/libreoffice-*
-./w/wireshark
-./w/webkit2gtk
-./m/mesa
-
 "
 
 for file in ${notused_pkgs} ; do
